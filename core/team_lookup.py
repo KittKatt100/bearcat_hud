@@ -30,7 +30,6 @@ def find_school(state: str, county: str, school_name: str):
     school_name = school_name.lower()
 
     schools = load_school_metadata()
-
     try:
         return schools[state][county][school_name]
     except KeyError:
