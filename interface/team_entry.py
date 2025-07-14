@@ -1,51 +1,40 @@
 import streamlit as st
-from memory.teams.team_memory import load_team_profile, save_team_profile
-
-def format_id(school, county, state):
-    return f"{school.lower().replace(' ', '_')}__{county.lower()}__{state.lower()}"
+from memory.teams import team_memory
 
 def main():
-    st.title("🏈 Dynamic Team Entry")
+    st.set_page_config(page_title="Team Entry", page_icon="🏈", layout="centered")
+    st.title("🏈 Bearcat HUD — Team Entry")
 
-    # Step 1: Coach enters details
-    school = st.text_input("School Name", placeholder="e.g. Bainbridge High School")
-    county = st.text_input("County", placeholder="e.g. Decatur")
-    state = st.text_input("State", placeholder="e.g. GA")
+    # Input fields for school details
+    st.subheader("Enter School Details")
+    school = st.text_input("School Name")
+    county = st.text_input("County")
+    state = st.text_input("State Abbreviation (e.g., GA, FL)")
 
-    if school and county and state:
-        team_id = format_id(school, county, state)
-        profile = load_team_profile(team_id)
+    # Submit button
+    if st.button("Search School"):
+        if not school or not county or not state:
+            st.warning("All fields are required.")
+            return
 
-        # Step 2: Load or show existing data
-        st.subheader(f"📋 Profile: {school} ({county} County, {state})")
+        # Generate team key and load profile
+        team_key = f"{school.strip().lower().replace(' ', '_')}_{county.strip().lower()}_{state.strip().upper()}"
+        team_data = team_memory.load_team_profile(team_key)
 
-        profile["school"] = school
-        profile["county"] = county
-        profile["state"] = state
-        profile["team_id"] = team_id
+        st.success(f"Profile found or created for: {school.title()} ({county.title()} County, {state.upper()})")
 
-        profile["mascot"] = st.text_input("Mascot", value=profile.get("mascot", ""))
-        profile["colors"] = {
-            "primary": st.color_picker("Primary Color", value=profile.get("colors", {}).get("primary", "#000000")),
-            "secondary": st.color_picker("Secondary Color", value=profile.get("colors", {}).get("secondary", "#ffffff"))
-        }
+        # Display basic team info
+        st.subheader("Team Information")
+        st.text(f"📊 Record: {team_data.get('record', 'N/A')}")
+        st.text(f"🐾 Mascot: {team_data.get('mascot', 'Not set')}")
+        st.text(f"🎨 Colors: {', '.join(team_data.get('colors', [])) or 'Not set'}")
 
-        st.markdown("### 🖼️ Logo / Image URLs")
-        urls = st.text_area("Image URLs (comma-separated)", value=", ".join(profile.get("images", [])))
-        profile["images"] = [url.strip() for url in urls.split(",") if url.strip()]
+        # Show images if available
+        if team_data.get("images"):
+            st.subheader("Team Images")
+            for img_url in team_data["images"]:
+                st.image(img_url, width=300)
+        else:
+            st.info("No team images available.")
 
-        # Step 3: Show team preview
-        st.markdown("### 🎨 Team Preview")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown(f"**Mascot:** {profile.get('mascot', '')}")
-            st.markdown(f"**Primary:** {profile['colors']['primary']}")
-            st.markdown(f"**Secondary:** {profile['colors']['secondary']}")
-        with col2:
-            for img in profile.get("images", []):
-                st.image(img, width=150)
-
-        # Step 4: Save profile
-        if st.button("💾 Save Team Profile"):
-            save_team_profile(team_id, profile)
-            st.success("Team profile saved successfully!")
+        # Future buttons could be added here for editing/updating profile
