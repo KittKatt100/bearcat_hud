@@ -33,8 +33,8 @@ class BearcatHUD:
         return list(self.games.keys())
 
     def get_quarters(self, game):
-        return list(self.games.get(game, {}).keys())
+        return list(self.games.get(game.strip(), {}).keys())
 
     def get_plays(self, game, quarter):
-        plays = self.games.get(game, {}).get(quarter, [])
+        plays = self.games.get(game.strip(), {}).get(quarter.strip(), [])
         return pd.DataFrame(plays)
