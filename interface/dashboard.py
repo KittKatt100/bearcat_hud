@@ -2,22 +2,22 @@ import streamlit as st
 import sys
 import os
 
-# Add project root to sys.path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Add the 'core' directory to sys.path
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'core'))
 
-from core.bearcat_hud import BearcatHUD
+from bearcat_hud import BearcatHUD
 
 st.set_page_config(page_title="Bearcat HUD", layout="wide")
 st.title("🏈 Bearcat HUD")
 
-# Initialize the HUD object
+# Initialize HUD
 try:
     hud = BearcatHUD()
 except Exception as e:
     st.error(f"❌ Failed to initialize HUD: {e}")
     st.stop()
 
-# Debug: Show available games
+# Verify method exists
 if not hasattr(hud, "get_game_list"):
     st.error("❌ BearcatHUD does not have method 'get_game_list'")
     st.stop()
@@ -38,6 +38,6 @@ if not quarter_list:
 
 selected_quarter = st.sidebar.selectbox("Choose a quarter", quarter_list)
 
-st.header(f"Plays for {selected_game} – Quarter {selected_quarter}")
+st.header(f"Plays for {selected_game} - Quarter {selected_quarter}")
 plays = hud.get_plays(selected_game, selected_quarter)
 st.dataframe(plays)
