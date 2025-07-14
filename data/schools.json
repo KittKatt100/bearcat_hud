@@ -1,1 +1,31 @@
+{
+  "florida": {
+    "gulf": {
+      "wewa high": {
+        "mascot": "Gators",
+        "colors": "Red & White",
+        "city": "Wewahitchka",
+        "logo": "https://upload.wikimedia.org/wikipedia/en/4/44/Florida_Gators_logo.svg"
+      }
+    },
+    "leon": {
+      "rickards high": {
+        "mascot": "Raiders",
+        "colors": "Blue & Gold",
+        "city": "Tallahassee",
+        "logo": "https://example.com/rickards_logo.png"
+      }
+    }
+  },
+  "georgia": {
+    "decatur": {
+      "bainbridge high": {
+        "mascot": "Bearcats",
+        "colors": "Purple & Gold",
+        "city": "Bainbridge",
+        "logo": "https://example.com/bainbridge_logo.png"
+      }
+    }
+  }
+}
 
