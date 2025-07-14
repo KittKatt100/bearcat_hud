@@ -1,36 +1,59 @@
 import streamlit as st
-from modules import team_lookup
+from core.team_lookup import find_school
+from core.overall_analysis import load_overall_analysis
 
 st.set_page_config(page_title="Bearcat HUD", layout="wide")
 
-# ---- HEADER ----
-st.markdown("<h1 style='text-align: center;'>🏈 Bearcat HUD</h1>", unsafe_allow_html=True)
-st.subheader("Enter Opponent Team Info")
+st.title("🏈 Bearcat HUD")
+st.header("Enter Opponent Team Info")
 
-# ---- TEAM ENTRY FORM ----
-with st.form("team_form"):
+with st.form("school_entry"):
     school_name = st.text_input("School Name")
     county = st.text_input("County")
     state = st.text_input("State")
-    submit = st.form_submit_button("Find School")
 
-# ---- LOOKUP AND DISPLAY RESULTS ----
-if submit:
-    result = team_lookup.find_school(state, county, school_name)
-    
-    if result:
-        st.success(f"Found {school_name} in {county} County, {state.upper()}")
-        col1, col2 = st.columns([1, 3])
+    submitted = st.form_submit_button("Find School")
 
-        with col1:
-            if "logo" in result and result["logo"]:
-                st.image(result["logo"], width=100, caption="Mascot")
-            else:
-                st.warning("Mascot image not available.")
+if submitted:
+    school_info = find_school(state, county, school_name)
 
-        with col2:
-            st.markdown(f"**Mascot:** {result.get('mascot', 'N/A')}")
-            st.markdown(f"**School Colors:** {result.get('colors', 'N/A')}")
-            st.markdown(f"**City:** {result.get('city', 'N/A')}")
-    else:
-        st.error("School not found. Please check spelling or try another combination.")
+    st.success(f"Found {school_info['school_name']} in {school_info['county']} County, {school_info['state'].upper()}")
+    st.image(school_info.get("logo", ""), width=80, caption="Mascot")
+    st.markdown(f"**Mascot:** {school_info.get('mascot', 'N/A')}")
+    st.markdown(f"**School Colors:** {school_info.get('colors', 'N/A')}")
+    st.markdown(f"**City:** {school_info.get('city', 'N/A')}")
+
+    st.divider()
+    st.subheader("📊 Overall Team Analysis")
+
+    analysis = load_overall_analysis(school_name, county, state)
+
+    with st.expander("1. Opponent Identity", expanded=True):
+        st.json(analysis.get("identity", {}))
+
+    with st.expander("2. Offensive Philosophy Summary"):
+        st.json(analysis.get("offense", {}))
+
+    with st.expander("3. Quarterback Profile"):
+        st.json(analysis.get("quarterback", {}))
+
+    with st.expander("4. Offensive Line Evaluation"):
+        st.json(analysis.get("oline", {}))
+
+    with st.expander("5. Skill Player Impact Review"):
+        st.json(analysis.get("skill", {}))
+
+    with st.expander("6. Formational DNA"):
+        st.json(analysis.get("formation", {}))
+
+    with st.expander("7. Scoring Patterns and Game Flow"):
+        st.json(analysis.get("scoring", {}))
+
+    with st.expander("8. Situational Awareness"):
+        st.json(analysis.get("situational", {}))
+
+    with st.expander("9. Psychological and Team Culture Profile"):
+        st.json(analysis.get("psych", {}))
+
+    with st.expander("10. Tells and Tactical Cues"):
+        st.json(analysis.get("tells", {}))
