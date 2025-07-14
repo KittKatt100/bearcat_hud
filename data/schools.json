@@ -1,7 +1,7 @@
 {
   "florida": {
     "gulf": {
-      "wewa high": {
+      "wewahitchka high": {
         "mascot": "Gators",
         "colors": "Red & White",
         "city": "Wewahitchka",
@@ -9,19 +9,29 @@
         "record": "6-4",
         "region_standing": "3rd in Region 1",
         "recent_trends": "Won 3 of last 4",
-        "logo": "https://upload.wikimedia.org/wikipedia/en/4/44/Florida_Gators_logo.svg"
+        "logo": "https://s3.amazonaws.com/media.hudl.com/logos/29580_wa.png"
       }
     },
     "leon": {
       "rickards high": {
         "mascot": "Raiders",
-        "colors": "Blue & Gold",
+        "colors": "Royal Blue & Old Gold",
         "city": "Tallahassee",
         "classification": "FHSAA 3A",
         "record": "7-3",
         "region_standing": "2nd in Region 2",
         "recent_trends": "Lost 2 close games",
-        "logo": "https://example.com/rickards_logo.png"
+        "logo": "https://s3.amazonaws.com/media.hudl.com/logos/35763_wa.png"
+      },
+      "godby high": {
+        "mascot": "Cougars",
+        "colors": "Columbia Blue & White",
+        "city": "Tallahassee",
+        "classification": "FHSAA 2A",
+        "record": "4-6",
+        "region_standing": "5th in Region 1",
+        "recent_trends": "Dropped last 3 games",
+        "logo": "https://s3.amazonaws.com/media.hudl.com/logos/28200_wa.png"
       }
     }
   },
@@ -35,7 +45,55 @@
         "record": "8-2",
         "region_standing": "1st in Region 1",
         "recent_trends": "5-game winning streak",
-        "logo": "https://example.com/bainbridge_logo.png"
+        "logo": "https://s3.amazonaws.com/media.hudl.com/logos/15645_wa.png"
+      }
+    },
+    "grady": {
+      "cairo high": {
+        "mascot": "Syrupmakers",
+        "colors": "Garnet & White",
+        "city": "Cairo",
+        "classification": "GHSA 4A",
+        "record": "9-1",
+        "region_standing": "1st in Region 1",
+        "recent_trends": "On fire—only 1 loss",
+        "logo": "https://s3.amazonaws.com/media.hudl.com/logos/18743_wa.png"
+      }
+    },
+    "thomas": {
+      "thomasville high": {
+        "mascot": "Bulldogs",
+        "colors": "Red & Gold",
+        "city": "Thomasville",
+        "classification": "GHSA 1A D-I",
+        "record": "6-5",
+        "region_standing": "3rd in Region 1",
+        "recent_trends": "Up and down season",
+        "logo": "https://s3.amazonaws.com/media.hudl.com/logos/17786_wa.png"
+      }
+    },
+    "colquitt": {
+      "colquitt county high": {
+        "mascot": "Packers",
+        "colors": "Black & Gold",
+        "city": "Moultrie",
+        "classification": "GHSA 7A",
+        "record": "10-0",
+        "region_standing": "1st in Region 1",
+        "recent_trends": "Undefeated",
+        "logo": "https://s3.amazonaws.com/media.hudl.com/logos/16113_wa.png"
+      }
+    },
+    "brooks": {
+      "brooks county high": {
+        "mascot": "Trojans",
+        "colors": "Navy Blue & Gold",
+        "city": "Quitman",
+        "classification": "GHSA A D-II",
+        "record": "7-3",
+        "region_standing": "2nd in Region 2",
+        "recent_trends": "Steady improvement",
+        "logo": "https://s3.amazonaws.com/media.hudl.com/logos/17202_wa.png"
       }
     }
   }
