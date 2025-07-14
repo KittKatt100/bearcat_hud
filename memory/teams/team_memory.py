@@ -9,7 +9,6 @@ def _team_path(team_name: str):
 def load_team_profile(team_name: str):
     path = _team_path(team_name)
     if not os.path.exists(path):
-        # Return an empty template if the file doesn’t exist yet
         return {
             "team_name": team_name,
             "record": "0-0",
@@ -25,4 +24,4 @@ def save_team_profile(team_name: str, data: dict):
     os.makedirs(TEAM_FOLDER, exist_ok=True)
     path = _team_path(team_name)
     with open(path, "w") as f:
-        json.dump(data, f, indent=2)
+        json.dump(data, f, indent=4)
