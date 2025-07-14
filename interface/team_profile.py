@@ -9,4 +9,9 @@ PAGES = {
 st.sidebar.title("📊 Bearcat HUD Navigation")
 selection = st.sidebar.radio("Go to", list(PAGES.keys()))
 page = PAGES[selection]
-page.main()  # ensure each module defines a main() function
+page.main() # ensure each module defines a main() function
+
+def main():
+    st.title("🏈 Team Memory Manager")
+    # (everything else remains unchanged)
+
