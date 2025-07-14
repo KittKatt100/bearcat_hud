@@ -33,8 +33,12 @@ class BearcatHUD:
         return list(self.games.keys())
 
     def get_quarters(self, game):
-        return list(self.games.get(game.strip(), {}).keys())
+        cleaned_game = game.strip()
+        if cleaned_game not in self.games:
+            print(f"⚠️ Game '{cleaned_game}' not found in available games: {list(self.games.keys())}")
+            return []
+        return list(self.games[cleaned_game].keys())
 
     def get_plays(self, game, quarter):
-        plays = self.games.get(game.strip(), {}).get(quarter.strip(), [])
+        plays = self.games.get(game, {}).get(quarter, [])
         return pd.DataFrame(plays)
