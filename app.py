@@ -1,12 +1,11 @@
 import streamlit as st
-from interface import dashboard, team_profile
+from interface import dashboard, team_entry
 
 PAGES = {
     "Dashboard": dashboard,
-    "Team Profiles": team_profile,
+    "Team Entry": team_entry
 }
 
-st.sidebar.title("📊 Bearcat HUD Navigation")
-selection = st.sidebar.radio("Go to", list(PAGES.keys()))
-page = PAGES[selection]
-page.main()  # ensure each module defines a main() function
+st.sidebar.title("📊 Bearcat HUD")
+page = st.sidebar.radio("Navigate", list(PAGES.keys()))
+PAGES[page].main()
