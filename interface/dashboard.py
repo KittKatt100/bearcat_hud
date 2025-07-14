@@ -1,5 +1,5 @@
 import streamlit as st
-from core.bearcat_hud import BearcatHUD
+from bearcat_hud.core.bearcat_hud import BearcatHUD
 
 st.set_page_config(page_title="Bearcat HUD", layout="wide")
 
