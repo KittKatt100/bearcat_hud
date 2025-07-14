@@ -1,37 +1,40 @@
-import streamlit as st
-from core.bearcat_hud import BearcatHUD
+import pandas as pd
 
-st.set_page_config(page_title="Bearcat HUD", layout="wide")
-st.title("🏈 Bearcat HUD")
+class BearcatHUD:
+    def __init__(self):
+        try:
+            self.games = {
+                "Game 1": {
+                    "Q1": [
+                        {"play": "Run Left", "yards": 5},
+                        {"play": "Pass Right", "yards": 12}
+                    ],
+                    "Q2": [
+                        {"play": "Run Center", "yards": 3},
+                        {"play": "Pass Deep", "yards": 25}
+                    ]
+                },
+                "Game 2": {
+                    "Q1": [
+                        {"play": "Run Right", "yards": 7},
+                        {"play": "Pass Left", "yards": 8}
+                    ],
+                    "Q2": [
+                        {"play": "Pass Short", "yards": 4},
+                        {"play": "Run Sweep", "yards": 9}
+                    ]
+                }
+            }
+        except Exception as e:
+            print("❌ Error setting up BearcatHUD:", e)
+            self.games = {}
 
-# Initialize the HUD object
-try:
-    hud = BearcatHUD()
-except Exception as e:
-    st.error(f"❌ Failed to initialize HUD: {e}")
-    st.stop()
+    def get_game_list(self):
+        return list(self.games.keys())
 
-# Debug: Show available games
-if not hasattr(hud, "get_game_list"):
-    st.error("❌ BearcatHUD does not have method 'get_game_list'")
-    st.stop()
+    def get_quarters(self, game):
+        return list(self.games.get(game, {}).keys())
 
-st.sidebar.header("Select Options")
-
-game_list = hud.get_game_list()
-if not game_list:
-    st.warning("⚠️ No games found.")
-    st.stop()
-
-selected_game = st.sidebar.selectbox("Choose a game", game_list)
-
-quarter_list = hud.get_quarters(selected_game)
-if not quarter_list:
-    st.warning("⚠️ No quarters found for selected game.")
-    st.stop()
-
-selected_quarter = st.sidebar.selectbox("Choose a quarter", quarter_list)
-
-st.header(f"Plays for {selected_game} - Quarter {selected_quarter}")
-plays = hud.get_plays(selected_game, selected_quarter)
-st.dataframe(plays)
+    def get_plays(self, game, quarter):
+        plays = self.games.get(game, {}).get(quarter, [])
+        return pd.DataFrame(plays)
