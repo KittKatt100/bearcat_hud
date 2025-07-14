@@ -1,0 +1,32 @@
+import os
+import json
+
+ANALYSIS_FOLDER = "data/analysis"
+
+def _analysis_path(team_name: str):
+    filename = f"{team_name.lower().replace(' ', '_')}.json"
+    return os.path.join(ANALYSIS_FOLDER, filename)
+
+def load_team_analysis(team_name: str):
+    path = _analysis_path(team_name)
+    if not os.path.exists(path):
+        return {
+            "opponent_identity": {},
+            "offensive_philosophy": {},
+            "quarterback": {},
+            "offensive_line": {},
+            "skill_players": {},
+            "formational_dna": {},
+            "scoring_patterns": {},
+            "situational_awareness": {},
+            "psychological_profile": {},
+            "tactical_tells": {}
+        }
+    with open(path, "r") as f:
+        return json.load(f)
+
+def save_team_analysis(team_name: str, data: dict):
+    os.makedirs(ANALYSIS_FOLDER, exist_ok=True)
+    path = _analysis_path(team_name)
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2)
