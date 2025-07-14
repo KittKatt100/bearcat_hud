@@ -26,27 +26,15 @@ class BearcatHUD:
                 }
             }
         except Exception as e:
-            print(f"❌ Error loading game data: {e}")
+            print("❌ Error setting up BearcatHUD:", e)
             self.games = {}
 
     def get_game_list(self):
-        try:
-            return list(self.games.keys())
-        except Exception as e:
-            print(f"❌ Error getting game list: {e}")
-            return []
+        return list(self.games.keys())
 
     def get_quarters(self, game):
-        try:
-            return list(self.games.get(game, {}).keys())
-        except Exception as e:
-            print(f"❌ Error getting quarters for {game}: {e}")
-            return []
+        return list(self.games.get(game, {}).keys())
 
     def get_plays(self, game, quarter):
-        try:
-            plays = self.games.get(game, {}).get(quarter, [])
-            return pd.DataFrame(plays)
-        except Exception as e:
-            print(f"❌ Error getting plays for {game} Q{quarter}: {e}")
-            return pd.DataFrame()
+        plays = self.games.get(game, {}).get(quarter, [])
+        return pd.DataFrame(plays)
