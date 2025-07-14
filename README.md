@@ -1,2 +1,10 @@
-# bearcat-hud
-A real-time, module-based scouting system designed to help high school football programs analyze opponent tendencies, interpret play data, and prepare smarter game plans. Built for the Bainbridge Bearcats and scalable to any program.
+# 🏈 Bearcat HUD
+
+Bearcat HUD (Heads-Up Display) is a tactical web app for high school football coaching. Run scouting modules, analyze play tendencies, and upload game film CSVs.
+
+## 🔧 Setup
+
+```bash
+pip install -r requirements.txt
+streamlit run interface/dashboard.py
+```
