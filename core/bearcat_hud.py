@@ -1,22 +1,37 @@
+import pandas as pd
+
 class BearcatHUD:
     def __init__(self):
-        # Placeholder sample data structure
+        # Mock data for testing without file dependencies
         self.games = {
             "Game 1": {
-                "1st Quarter": [{"Play": "Run Left"}, {"Play": "Pass Right"}],
-                "2nd Quarter": [{"Play": "QB Sneak"}, {"Play": "Screen Pass"}]
+                "Q1": [
+                    {"play": "Run Left", "yards": 5},
+                    {"play": "Pass Right", "yards": 12}
+                ],
+                "Q2": [
+                    {"play": "Run Center", "yards": 3},
+                    {"play": "Pass Deep", "yards": 25}
+                ]
             },
             "Game 2": {
-                "1st Quarter": [{"Play": "Run Right"}],
-                "2nd Quarter": [{"Play": "Field Goal"}]
+                "Q1": [
+                    {"play": "Run Right", "yards": 7},
+                    {"play": "Pass Left", "yards": 8}
+                ],
+                "Q2": [
+                    {"play": "Pass Short", "yards": 4},
+                    {"play": "Run Sweep", "yards": 9}
+                ]
             }
         }
 
     def get_game_list(self):
         return list(self.games.keys())
 
-    def get_quarter_list(self, game):
-        return list(self.games[game].keys()) if game in self.games else []
+    def get_quarters(self, game):
+        return list(self.games.get(game, {}).keys())
 
     def get_plays(self, game, quarter):
-        return self.games.get(game, {}).get(quarter, [])
+        plays = self.games.get(game, {}).get(quarter, [])
+        return pd.DataFrame(plays)
