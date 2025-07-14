@@ -2,7 +2,6 @@ import pandas as pd
 
 class BearcatHUD:
     def __init__(self):
-        # Mock data for testing without file dependencies
         self.games = {
             "Game 1": {
                 "Q1": [
