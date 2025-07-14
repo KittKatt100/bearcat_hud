@@ -3,8 +3,12 @@
     "gulf": {
       "wewa high": {
         "mascot": "Gators",
-        "colors": "Red & White",
+        "colors": "Green & Orange",
         "city": "Wewahitchka",
+        "classification": "FHSAA 1A",
+        "record": "6-4",
+        "region_standing": "3rd in Region 1",
+        "recent_trends": "Won 3 of last 4",
         "logo": "https://upload.wikimedia.org/wikipedia/en/4/44/Florida_Gators_logo.svg"
       }
     },
@@ -13,6 +17,10 @@
         "mascot": "Raiders",
         "colors": "Blue & Gold",
         "city": "Tallahassee",
+        "classification": "FHSAA 3A",
+        "record": "7-3",
+        "region_standing": "2nd in Region 2",
+        "recent_trends": "Lost 2 close games",
         "logo": "https://example.com/rickards_logo.png"
       }
     }
@@ -23,9 +31,12 @@
         "mascot": "Bearcats",
         "colors": "Purple & Gold",
         "city": "Bainbridge",
+        "classification": "GHSA 4A",
+        "record": "8-2",
+        "region_standing": "1st in Region 1",
+        "recent_trends": "5-game winning streak",
         "logo": "https://example.com/bainbridge_logo.png"
       }
     }
   }
 }
-
