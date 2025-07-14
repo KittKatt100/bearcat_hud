@@ -1,4 +1,10 @@
 import streamlit as st
+import sys
+import os
+
+# Add the parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from core.bearcat_hud import BearcatHUD
 
 st.set_page_config(page_title="Bearcat HUD", layout="wide")
