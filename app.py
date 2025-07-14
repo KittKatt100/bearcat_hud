@@ -1,10 +1,12 @@
 import streamlit as st
-from interface.dashboard import render_dashboard
+from interface import dashboard, team_profile
 
-def main():
-    st.set_page_config(page_title="Bearcat HUD", page_icon="🏈", layout="wide")
-    render_dashboard()
+PAGES = {
+    "Dashboard": dashboard,
+    "Team Profiles": team_profile,
+}
 
-if __name__ == "__main__":
-    main()
-
+st.sidebar.title("📊 Bearcat HUD Navigation")
+selection = st.sidebar.radio("Go to", list(PAGES.keys()))
+page = PAGES[selection]
+page.main()  # ensure each module defines a main() function
