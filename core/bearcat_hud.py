@@ -1,14 +1,14 @@
 class BearcatHUD:
     def __init__(self):
-        # Example data — replace with real data later
+        # Placeholder sample data structure
         self.games = {
             "Game 1": {
-                "1st": [{"Play": "Run Left"}, {"Play": "Pass Right"}],
-                "2nd": [{"Play": "QB Sneak"}, {"Play": "Screen Pass"}],
+                "1st Quarter": [{"Play": "Run Left"}, {"Play": "Pass Right"}],
+                "2nd Quarter": [{"Play": "QB Sneak"}, {"Play": "Screen Pass"}]
             },
             "Game 2": {
-                "1st": [{"Play": "Run Right"}],
-                "2nd": [{"Play": "Field Goal"}],
+                "1st Quarter": [{"Play": "Run Right"}],
+                "2nd Quarter": [{"Play": "Field Goal"}]
             }
         }
 
