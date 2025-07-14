@@ -1,31 +1,23 @@
 {
   "florida": {
     "bay": {
-      "rutherford high": {
-        "mascot": "Rams",
-        "colors": "Black & Gold",
+      "bay high": {
+        "mascot": "Tornadoes",
         "city": "Panama City",
         "classification": "4A",
         "record": "3-2",
-        "region_standing": "2nd in Region 1-4A",
-        "recent_trends": "Won last 2 games",
-        "logo": "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
-        "school_name": "Rutherford High",
-        "county": "Bay",
-        "state": "Florida"
+        "region_standing": "2nd",
+        "recent_trends": "Won 3 straight",
+        "logo": "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg"
       },
-      "bay high": {
-        "mascot": "Tornadoes",
-        "colors": "Red & White",
+      "rutherford high": {
+        "mascot": "Rams",
         "city": "Panama City",
         "classification": "4A",
-        "record": "4-1",
-        "region_standing": "1st in Region 1-4A",
-        "recent_trends": "Won 4 of last 5",
-        "logo": "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
-        "school_name": "Bay High",
-        "county": "Bay",
-        "state": "Florida"
+        "record": "2-3",
+        "region_standing": "5th",
+        "recent_trends": "Lost last 2",
+        "logo": "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg"
       }
     }
   }
