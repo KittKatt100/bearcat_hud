@@ -1,1 +1,17 @@
+{
+  "florida": {
+    "bay": {
+      "rutherford high": {
+        "classification": "FHSAA 4A"
+      }
+    }
+  },
+  "georgia": {
+    "thomas": {
+      "thomas county central": {
+        "classification": "GHSA 6A"
+      }
+    }
+  }
+}
 
