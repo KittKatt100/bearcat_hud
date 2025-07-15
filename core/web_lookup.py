@@ -21,10 +21,21 @@ def get_school_web_data(school_name, county, state):
     try:
         with DDGS() as ddgs:
             results = list(ddgs.text(query, max_results=3))
+
+            # --- DEBUGGING PRINT STATEMENTS ---
+            print(f"DEBUG: Search Query: {query}")
+            print(f"DEBUG: DuckDuckGo Results (first 3):")
+            if not results:
+                print("DEBUG: No search results found for this query.")
+            for i, r in enumerate(results):
+                print(f"  {i+1}. Title: {r.get('title')}, URL: {r.get('href')}")
+            # --- END DEBUGGING PRINT STATEMENTS ---
+
             if not results:
                 return info
 
             url = results[0]["href"]
+            print(f"DEBUG: Attempting to scrape URL: {url}") # Added for clarity
             html = requests.get(url, timeout=8).text
             soup = BeautifulSoup(html, "html.parser")
             text = soup.get_text(" ", strip=True).lower()
@@ -63,6 +74,6 @@ def get_school_web_data(school_name, county, state):
                     break
 
     except Exception as e:
-        print("Web scrape failed:", e)
+        print(f"Web scrape failed: {e}") # Changed to f-string for better debugging
 
     return info
