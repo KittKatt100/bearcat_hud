@@ -1,1 +1,15 @@
+{
+  "georgia": {
+    "association": "GHSA",
+    "playoff_structure": "Region -> State Playoffs",
+    "season_start": "Late August",
+    "notes": "Classification levels range from A to 7A. GHSA schools are grouped by enrollment and region."
+  },
+  "florida": {
+    "association": "FHSAA",
+    "playoff_structure": "Districts -> Regionals -> State",
+    "season_start": "Mid August",
+    "notes": "Florida schools are ranked by FHSAA into classifications 1A to 4S, depending on size and sport."
+  }
+}
 
