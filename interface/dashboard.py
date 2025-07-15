@@ -29,13 +29,61 @@ def set_theme():
         img {
             border-radius: 10px;
         }
+        .info-not-available {
+            color: #AAAAAA;
+            font-style: italic;
+        }
         </style>
     """, unsafe_allow_html=True)
 
 def display_value(label, value):
-    if not value or "placeholder" in str(value).lower() or value.lower() in ["unknown", "n/a", "no data available"]:
-        value = "Info Not Available"
-    st.markdown(f"**{label}:** {value}")
+    if not value or "placeholder" in str(value).lower() or \
+        value.lower() in ["unknown", "n/a", "no data available"]:
+        st.markdown(f"**{label}:** <span class='info-not-available'>Info Not Available</span>", unsafe_allow_html=True)
+    else:
+        st.markdown(f"**{label}:** {value}")
+
+def generate_overall_analysis(school_data):
+    """
+    Generates a placeholder for the Overall Team Analysis.
+    Replace/mock these with actual logic as you collect more opponent data!
+    """
+    school_name = school_data.get('school', 'The Team').title()
+
+    return f"""
+    <h4>Overview for {school_name}</h4>
+    <p>This is a demonstration of what the "Overall Team Analysis" will look like.</p>
+
+    <h3>Strengths 💪</h3>
+    <ul>
+        <li>Strong running game behind a physical offensive line</li>
+        <li>Aggressive linebacker play, especially on early downs</li>
+        <li>Special teams consistently pin opponents deep</li>
+    </ul>
+
+    <h3>Weaknesses 📉</h3>
+    <ul>
+        <li>Pass defense struggles with deep routes</li>
+        <li>Quarterback can be forced into mistakes under blitz pressure</li>
+        <li>Secondary tackling can be inconsistent in open space</li>
+    </ul>
+
+    <h3>Key Players to Watch 👀</h3>
+    <ul>
+        <li>#7 - Dual-threat QB with a strong arm and quick feet</li>
+        <li>#22 - RB who excels at yards after contact</li>
+        <li>#55 - Defensive end, leads the team in sacks</li>
+    </ul>
+
+    <h3>Recent Trends 📈</h3>
+    <ul>
+        <li>Won 3 of last 4 games, all by less than one touchdown</li>
+        <li>Averaging 150+ rushing yards/game in last month</li>
+        <li>Turnover margin: -2 over their last 5 games</li>
+    </ul>
+
+    <p><i>This is sample analysis; replace with live scouting and stat breakdowns as you build your workflow!</i></p>
+    """
 
 def main():
     st.set_page_config(page_title="Bearcat HUD", layout="centered")
@@ -46,9 +94,10 @@ def main():
     st.subheader("Enter Opponent Team Info")
 
     with st.form("team_form"):
-        school = st.text_input("School Name")
-        county = st.text_input("County")
-        state = st.text_input("State")
+        # You can leave empty or use these default values for faster testing
+        school = st.text_input("School Name", value="Port St. Joe High")
+        county = st.text_input("County", value="Gulf")
+        state = st.text_input("State", value="Florida")
         submitted = st.form_submit_button("Find School")
 
     if submitted:
@@ -84,7 +133,8 @@ def main():
             display_value("Recent Trends", school_data.get("recent_trends"))
 
         st.markdown("---")
-        st.markdown("📊 *This is where your detailed Overall Team Analysis module will appear.*")
+        st.markdown("## 🧠 Overall Team Analysis")
+        st.markdown(generate_overall_analysis(school_data), unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
