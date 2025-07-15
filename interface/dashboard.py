@@ -1,5 +1,5 @@
 import streamlit as st
-from modules.team_lookup import find_school  # This is the correct import
+from modules.team_lookup import find_school
 
 def main():
     st.set_page_config(page_title="Bearcat HUD", layout="centered")
