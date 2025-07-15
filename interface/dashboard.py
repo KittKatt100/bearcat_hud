@@ -111,8 +111,3 @@ if submitted and school_name and county and state:
     st.markdown("### 🏈 Tactical Modules Snapshots")
     st.write(analyze_ol(school_info))
     st.write(analyze_qb(school_info))
-
-# Clarify: app.py vs dashboard.py
-# The screenshot from Streamlit Cloud shows interface/dashboard.py as the entry point.
-# If app.py is intended to be the main entry, its imports will need similar adjustments.
-# For now, we've focused on fixing dashboard.py as that's what's shown in the error.
