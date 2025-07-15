@@ -3,11 +3,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import streamlit as st
-# Make sure this import correctly points to core/team_lookup.py
-# based on the sys.path modification.
-# If team_lookup.py is directly in 'modules' then from modules.team_lookup is correct.
-# Given your earlier error and project structure, 'core.team_lookup' is more consistent.
-from core.team_lookup import find_school 
+from modules.team_lookup import find_school
 
 def set_theme():
     st.markdown("""
@@ -109,7 +105,7 @@ def main():
             st.error("Please fill in all three fields.")
             return
 
-        school_data = find_school(state, county, school) # This calls team_lookup which should call web_lookup
+        school_data = find_school(state, county, school)
 
         if "error" in school_data:
             st.error(school_data["error"])
