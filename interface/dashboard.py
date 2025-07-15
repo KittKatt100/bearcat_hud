@@ -1,9 +1,8 @@
 import streamlit as st
-from core.web_lookup import get_school_web_data  # Adjust the import path as needed
+from core.web_lookup import get_school_web_data  # Adjust this import if your structure is different
 
 def main():
     st.set_page_config(page_title="Bearcat HUD", layout="centered")
-
     st.title("🏈 Bearcat HUD")
     st.subheader("Enter Opponent Team Info")
 
@@ -18,9 +17,7 @@ def main():
             st.error("Please fill in all three fields.")
             return
 
-        # Fetch real data using DuckDuckGo (or your own lookup function)
         school_data = get_school_web_data(school, county, state)
-
         st.success(f"Found {school.title()} in {county.title()} County, {state.upper()}")
 
         col1, col2 = st.columns([1, 2])
@@ -31,14 +28,19 @@ def main():
                 caption="Mascot"
             )
 
+        def display_value(label, value):
+            if not value or "placeholder" in str(value).lower() or value.lower() in ["unknown", "n/a"]:
+                value = "Info Not Available"
+            st.markdown(f"**{label}:** {value}")
+
         with col2:
-            st.markdown(f"**Mascot:** {school_data.get('mascot', 'Unknown')}")
-            st.markdown(f"**School Colors:** {school_data.get('colors', 'Unknown')}")
-            st.markdown(f"**City:** {school_data.get('city', 'Unknown')}")
-            st.markdown(f"**Classification:** {school_data.get('classification', 'Unknown')}")
-            st.markdown(f"**Record:** {school_data.get('record', 'Unknown')}")
-            st.markdown(f"**Region Standing:** {school_data.get('region_standing', 'Unknown')}")
-            st.markdown(f"**Recent Trends:** {school_data.get('recent_trends', 'Unknown')}")
+            display_value("Mascot", school_data.get('mascot'))
+            display_value("School Colors", school_data.get('colors'))
+            display_value("City", school_data.get('city'))
+            display_value("Classification", school_data.get('classification'))
+            display_value("Record", school_data.get('record'))
+            display_value("Region Standing", school_data.get('region_standing'))
+            display_value("Recent Trends", school_data.get('recent_trends'))
 
 if __name__ == "__main__":
     main()
