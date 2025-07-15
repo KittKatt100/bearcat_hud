@@ -1,8 +1,8 @@
-import json
 import os
+import json
 import requests
-from duckduckgo_search import ddg
 from bs4 import BeautifulSoup
+from duckduckgo_search import ddg
 
 DATA_PATH = "data/schools.json"
 
@@ -12,11 +12,50 @@ def load_school_metadata():
     with open(DATA_PATH, "r") as f:
         return json.load(f)
 
+def extract_between_keywords(text, start_keywords, end_keywords):
+    for start in start_keywords:
+        start_index = text.find(start)
+        if start_index != -1:
+            sub_text = text[start_index + len(start):]
+            for end in end_keywords:
+                end_index = sub_text.find(end)
+                if end_index != -1:
+                    return sub_text[:end_index].strip().title()
+    return None
+
+def fetch_school_info_from_web(school_name, county, state):
+    query = f"{school_name} High School {county} County {state} mascot and school colors"
+    results = ddg(query, max_results=1)
+    
+    if not results:
+        return "Unknown Mascot", "Unknown Colors", "Unknown City"
+
+    url = results[0]['href']
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+    except Exception:
+        return "Unknown Mascot", "Unknown Colors", "Unknown City"
+
+    soup = BeautifulSoup(response.text, 'html.parser')
+    page_text = soup.get_text().lower()
+
+    mascot = extract_between_keywords(page_text, ["mascot is", "mascot:"], ["\n", ".", ","])
+    colors = extract_between_keywords(page_text, ["colors are", "school colors", "colors:"], ["\n", ".", ","])
+    city = extract_between_keywords(page_text, ["located in", "city of"], ["\n", ".", ","])
+
+    return (
+        mascot or "Unknown Mascot",
+        colors or "Unknown Colors",
+        city or "Unknown City"
+    )
+
 def fallback_data(school_name, county, state):
+    mascot, colors, city = fetch_school_info_from_web(school_name, county, state)
     return {
-        "mascot": "Unknown Mascot",
-        "colors": "Black & White",
-        "city": "Unknown",
+        "mascot": mascot,
+        "colors": colors,
+        "city": city,
         "classification": "Unknown",
         "record": "N/A",
         "region_standing": "N/A",
@@ -24,34 +63,8 @@ def fallback_data(school_name, county, state):
         "logo": "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
         "school_name": school_name.title(),
         "county": county.title(),
-        "state": state.title(),
+        "state": state.title()
     }
-
-def search_school_colors(school_name, county, state):
-    query = f"{school_name} {county} County {state} high school colors site:.edu OR site:.org"
-    results = ddg(query, max_results=5)
-    for result in results:
-        url = result.get("href")
-        try:
-            response = requests.get(url, timeout=10)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.text, "html.parser")
-                text = soup.get_text(separator=" ", strip=True).lower()
-                if "color" in text:
-                    for color_line in text.split("."):
-                        if "color" in color_line:
-                            return extract_colors_from_text(color_line)
-        except Exception:
-            continue
-    return "Black & White"
-
-def extract_colors_from_text(text):
-    known_colors = [
-        "black", "white", "blue", "gold", "green", "orange",
-        "red", "silver", "maroon", "purple", "yellow", "gray", "brown"
-    ]
-    found = [color.title() for color in known_colors if color in text]
-    return " & ".join(found) if found else "Black & White"
 
 def find_school(state: str, county: str, school_name: str):
     state = state.lower()
@@ -60,12 +73,6 @@ def find_school(state: str, county: str, school_name: str):
 
     schools = load_school_metadata()
     try:
-        school = schools[state][county][school_name]
-        if school.get("colors", "Black & White") == "Black & White":
-            updated_colors = search_school_colors(school_name, county, state)
-            school["colors"] = updated_colors
-        return school
+        return schools[state][county][school_name]
     except KeyError:
-        fallback = fallback_data(school_name, county, state)
-        fallback["colors"] = search_school_colors(school_name, county, state)
-        return fallback
+        return fallback_data(school_name, county, state)
