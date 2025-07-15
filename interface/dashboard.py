@@ -2,16 +2,19 @@ import streamlit as st
 import sys
 import os
 
-# Add the project root to the Python path
-# This allows imports like 'from core.team_lookup' to work correctly
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Ensure the project root is in the Python path
+# This is crucial for relative imports to work correctly
+# /mount/src/bearcat-hud
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
-# Now, import modules relative to the added path
+# Now, import modules using their paths relative to the project root
 from core.team_lookup import find_school
 from sections.overall_analysis import run_overall_analysis_ui
 from modules.ol_scheme import analyze_ol
 from modules.quarterback_targeting import analyze_qb
-from core.web_lookup import get_school_web_data # Ensure this is used if find_school relies on it
+from core.web_lookup import get_school_web_data
 
 st.set_page_config(page_title="Bearcat HUD", layout="wide")
 
@@ -75,8 +78,6 @@ with st.form("team_info_form"):
 
 # Step 2 – School Info & Analysis
 if submitted and school_name and county and state:
-    # Use get_school_web_data directly for debugging, as find_school might wrap it
-    # Or ensure find_school is correctly set up to use web_lookup
     school_info = get_school_web_data(school_name, county, state)
 
     st.success(f"Profile found or created for: {school_info['school_name']} ({school_info['county']} County, {school_info['state']})")
@@ -98,13 +99,7 @@ if submitted and school_name and county and state:
     # Step 3 – Full Analysis
     st.markdown("---")
     st.markdown("### 📊 Strategic Overview")
-    # This part assumes analysis_loader or overall_analysis has content to display
-    # For now, let's just show placeholder or dummy content if needed
     st.write("Full analysis will be displayed here based on loaded data.")
-
-    # You can integrate overall_analysis.py UI here if desired
-    # For now, keeping it simple to get past the import error
-    # run_overall_analysis_ui(f"{school_name}_{county}_{state}") # Example of calling a function from sections
 
     # Placeholder for OL Scheme and QB Targeting (from modules)
     st.markdown("---")
