@@ -1,5 +1,5 @@
 import streamlit as st
-from core.web_lookup import get_school_web_data  # Adjust this import if your structure is different
+from modules.team_lookup import find_school  # This is the correct import
 
 def main():
     st.set_page_config(page_title="Bearcat HUD", layout="centered")
@@ -17,7 +17,7 @@ def main():
             st.error("Please fill in all three fields.")
             return
 
-        school_data = get_school_web_data(school, county, state)
+        school_data = find_school(state, county, school)
         st.success(f"Found {school.title()} in {county.title()} County, {state.upper()}")
 
         col1, col2 = st.columns([1, 2])
@@ -29,7 +29,7 @@ def main():
             )
 
         def display_value(label, value):
-            if not value or "placeholder" in str(value).lower() or value.lower() in ["unknown", "n/a"]:
+            if not value or "placeholder" in str(value).lower() or value.lower() in ["unknown", "n/a", "no data available"]:
                 value = "Info Not Available"
             st.markdown(f"**{label}:** {value}")
 
