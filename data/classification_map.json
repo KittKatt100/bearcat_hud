@@ -1,17 +1,20 @@
 {
-  "florida": {
-    "bay": {
-      "rutherford high": {
-        "classification": "FHSAA 4A"
-      }
-    }
+  "GA": {
+    "name": "Georgia High School Association",
+    "abbr": "GHSA",
+    "levels": ["A", "AA", "AAA", "AAAA", "AAAAA", "AAAAAA", "AAAAAAA"],
+    "notes": "Georgia football classifications."
   },
-  "georgia": {
-    "thomas": {
-      "thomas county central": {
-        "classification": "GHSA 6A"
-      }
-    }
+  "FL": {
+    "name": "Florida High School Athletic Association",
+    "abbr": "FHSAA",
+    "levels": ["1S","2S","3S","4S","1M","2M","3M","4M","1R","2R","3R","4R"],
+    "notes": "Florida series and metro/rural split."
+  },
+  "AL": {
+    "name": "Alabama High School Athletic Association",
+    "abbr": "AHSAA",
+    "levels": ["1A","2A","3A","4A","5A","6A","7A"],
+    "notes": "Alabama football classifications."
   }
 }
-
