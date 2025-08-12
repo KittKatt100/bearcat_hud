@@ -1,4 +1,4 @@
-)# interface/dashboard.py
+# interface/dashboard.py
 import streamlit as st
 from core.team_lookup import find_school
 
