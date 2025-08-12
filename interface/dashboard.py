@@ -1,144 +1,102 @@
-import sys
+# interface/dashboard.py
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import streamlit as st
-# Make sure this import correctly points to core/team_lookup.py
-# based on the sys.path modification.
-# If team_lookup.py is directly in 'modules' then from modules.team_lookup is correct.
-# Given your earlier error and project structure, 'core.team_lookup' is more consistent.
-from core.team_lookup import find_school 
 
-def set_theme():
-    st.markdown("""
-        <style>
-        body {
-            background-color: #1A0033;
-            color: #FFD700;
-        }
-        .stApp {
-            background-color: #1A0033;
-        }
-        .stTextInput>div>div>input {
-            background-color: #2A0044;
-            color: #FFD700;
-        }
-        .stFormSubmitButton>button {
-            background-color: #FFD700;
-            color: #1A0033;
-        }
-        .css-1d391kg, .css-10trblm, .stMarkdown {
-            color: #FFD700 !important;
-        }
-        img {
-            border-radius: 10px;
-        }
-        .info-not-available {
-            color: #AAAAAA;
-            font-style: italic;
-        }
-        </style>
-    """, unsafe_allow_html=True)
+from core.team_lookup import find_school
+from core.overall_analysis import build_overall_analysis
+from core.analysis_loader import save_analysis, make_slug
 
-def display_value(label, value):
-    if not value or "placeholder" in str(value).lower() or \
-        value.lower() in ["unknown", "n/a", "no data available"]:
-        st.markdown(f"**{label}:** <span class='info-not-available'>Info Not Available</span>", unsafe_allow_html=True)
-    else:
-        st.markdown(f"**{label}:** {value}")
+PURPLE_BG = "#1b0f2d"   # very dark purple
+GOLD_TEXT = "#ffd34d"   # gold
 
-def generate_overall_analysis(school_data):
-    """
-    Generates a placeholder for the Overall Team Analysis.
-    Replace/mock these with actual logic as you collect more opponent data!
-    """
-    school_name = school_data.get('school', 'The Team').title()
+CUSTOM_CSS = f"""
+<style>
+  .stApp {{
+      background-color: {PURPLE_BG};
+  }}
+  h1, h2, h3, h4, h5, h6, label, p, span {{
+      color: {GOLD_TEXT} !important;
+  }}
+  .stTextInput>div>div>input, .stTextInput>div>div>textarea,
+  .stSelectbox>div>div>div>input {{
+      color: #eee !important;
+      background-color: rgba(255,255,255,0.06) !important;
+      border: 1px solid rgba(255,255,255,0.15);
+  }}
+  .found-box {{
+      background: #14321f;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #d7ffd7;
+      border: 1px solid #295c3a;
+  }}
+  .section-break {{
+      border-top: 1px solid rgba(255,255,255,0.12);
+      margin: 1.25rem 0;
+  }}
+</style>
+"""
 
-    return f"""
-    <h4>Overview for {school_name}</h4>
-    <p>This is a demonstration of what the "Overall Team Analysis" will look like.</p>
-
-    <h3>Strengths 💪</h3>
-    <ul>
-        <li>Strong running game behind a physical offensive line</li>
-        <li>Aggressive linebacker play, especially on early downs</li>
-        <li>Special teams consistently pin opponents deep</li>
-    </ul>
-
-    <h3>Weaknesses 📉</h3>
-    <ul>
-        <li>Pass defense struggles with deep routes</li>
-        <li>Quarterback can be forced into mistakes under blitz pressure</li>
-        <li>Secondary tackling can be inconsistent in open space</li>
-    </ul>
-
-    <h3>Key Players to Watch 👀</h3>
-    <ul>
-        <li>#7 - Dual-threat QB with a strong arm and quick feet</li>
-        <li>#22 - RB who excels at yards after contact</li>
-        <li>#55 - Defensive end, leads the team in sacks</li>
-    </ul>
-
-    <h3>Recent Trends 📈</h3>
-    <ul>
-        <li>Won 3 of last 4 games, all by less than one touchdown</li>
-        <li>Averaging 150+ rushing yards/game in last month</li>
-        <li>Turnover margin: -2 over their last 5 games</li>
-    </ul>
-
-    <p><i>This is sample analysis; replace with live scouting and stat breakdowns as you build your workflow!</i></p>
-    """
+def _val(x):
+    if not x or str(x).strip().lower() in {"unknown", "info not available", "n/a"}:
+        return "Info Not Available"
+    return x
 
 def main():
-    st.set_page_config(page_title="Bearcat HUD", layout="centered")
-    set_theme()
+    st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
+    st.title("🏈 Bearcat HUD")
 
-    st.image("https://pbs.twimg.com/profile_images/1062073323466227712/mQk4KnxY_400x400.jpg", width=100)
-    st.title("💜💛 Bearcat HUD")
     st.subheader("Enter Opponent Team Info")
-
-    with st.form("team_form"):
-        # You can leave empty or use these default values for faster testing
-        school = st.text_input("School Name", value="Port St. Joe High")
-        county = st.text_input("County", value="Gulf")
-        state = st.text_input("State", value="Florida")
+    with st.form("team_form", clear_on_submit=False):
+        school = st.text_input("School Name")
+        county = st.text_input("County")
+        state  = st.text_input("State")
         submitted = st.form_submit_button("Find School")
 
-    if submitted:
-        if not (school and county and state):
-            st.error("Please fill in all three fields.")
-            return
+    if not submitted:
+        return
 
-        school_data = find_school(state, county, school) # This calls team_lookup which should call web_lookup
+    if not (school and county and state):
+        st.error("Please fill in all three fields.")
+        return
 
-        if "error" in school_data:
-            st.error(school_data["error"])
-            return
+    with st.spinner("Finding school and pulling quick intel..."):
+        school_data = find_school(state, county, school)
 
-        st.success(f"Found {school.title()} in {county.title()} County, {state.upper()}")
+    st.markdown(
+        f'<div class="found-box">Found <b>{school.title()}</b> in {county.title()} County, {state.upper()}</div>',
+        unsafe_allow_html=True
+    )
 
-        st.markdown(f"## {school_data.get('school', 'School')} - Overall Team Analysis")
+    # Header
+    st.markdown(f"## {school.title()} - Overall Team Analysis")
 
-        col1, col2 = st.columns([1, 2])
+    # Logo + quick facts
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.image(
+            school_data.get("logo", "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg"),
+            caption="Mascot", use_column_width=True
+        )
+    with col2:
+        st.markdown(f"**Mascot:** {_val(school_data.get('mascot'))}")
+        st.markdown(f"**School Colors:** {_val(school_data.get('colors'))}")
+        st.markdown(f"**City:** {_val(school_data.get('city'))}")
+        st.markdown(f"**Classification:** {_val(school_data.get('classification'))}")
+        st.markdown(f"**Record:** {_val(school_data.get('record'))}")
+        st.markdown(f"**Region Standing:** {_val(school_data.get('region_standing'))}")
+        st.markdown(f"**Recent Trends:** {_val(school_data.get('recent_trends'))}")
 
-        with col1:
-            st.image(
-                school_data.get("logo", "https://via.placeholder.com/150x150.png?text=Mascot"),
-                caption="Mascot"
-            )
+    st.markdown('<div class="section-break"></div>', unsafe_allow_html=True)
 
-        with col2:
-            display_value("Mascot", school_data.get("mascot"))
-            display_value("School Colors", school_data.get("colors"))
-            display_value("City", school_data.get("city"))
-            display_value("Classification", school_data.get("classification"))
-            display_value("Record", school_data.get("record"))
-            display_value("Region Standing", school_data.get("region_standing"))
-            display_value("Recent Trends", school_data.get("recent_trends"))
+    # Build and save analysis
+    with st.spinner("Generating Overall Team Analysis…"):
+        analysis = build_overall_analysis(school_data)
 
-        st.markdown("---")
-        st.markdown("## 🧠 Overall Team Analysis")
-        st.markdown(generate_overall_analysis(school_data), unsafe_allow_html=True)
+    slug = make_slug(school, county, state)
+    path = save_analysis(slug, analysis)
 
-if __name__ == "__main__":
-    main()
+    st.markdown("### Analysis Summary")
+    st.json(analysis)
+
+    st.caption(f"Saved analysis to: `{path}`")
