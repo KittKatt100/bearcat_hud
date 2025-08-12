@@ -1,14 +1,13 @@
-# core/web_lookup.py
-"""
-Best-effort web probe:
-- Tries DuckDuckGo & simple page scrape to guess mascot/logo/record/city.
-- Always returns a dict with fields filled or "Info Not Available".
-- Stays resilient if packages or network aren’t available.
-"""
+# bearcat_hud/core/web_lookup.py
+import requests
+from duckduckgo_search import DDGS
+from bs4 import BeautifulSoup
+
 INFO_NA = "Info Not Available"
 
 def get_school_web_data(school_name: str, county: str, state: str) -> dict:
-    data = {
+    query = f'{school_name} {county} County {state} high school football site:.edu OR site:.org'
+    info = {
         "mascot": INFO_NA,
         "colors": INFO_NA,
         "city": INFO_NA,
@@ -17,69 +16,57 @@ def get_school_web_data(school_name: str, county: str, state: str) -> dict:
         "region_standing": INFO_NA,
         "recent_trends": INFO_NA,
         "logo": "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
-        "school_name": school_name.title(),
-        "county": county.title(),
-        "state": state.title()
+        "raw_text": ""
     }
 
-    # Lazy imports (so app still runs if these aren’t installed yet)
-    try:
-        import requests
-        from duckduckgo_search import DDGS
-        from bs4 import BeautifulSoup
-    except Exception:
-        return data  # keep app functional
-
-    query = f'{school_name} {county} County {state} high school football site:.edu OR site:.k12.* OR site:.org'
     try:
         with DDGS() as ddgs:
             results = list(ddgs.text(query, max_results=3))
         if not results:
-            return data
+            return info
 
-        url = results[0].get("href") or results[0].get("url")
+        # take the first plausible result
+        url = results[0].get("href") or results[0].get("url") or results[0].get("link")
         if not url:
-            return data
+            return info
 
         html = requests.get(url, timeout=8).text
         soup = BeautifulSoup(html, "html.parser")
         text = soup.get_text(" ", strip=True)
+        info["raw_text"] = text
 
-        # Very light heuristics
-        mascots = ["tigers","bulldogs","wildcats","gators","patriots","tornadoes",
-                   "sharks","panthers","eagles","lions","hornets","crimson tide"]
         low = text.lower()
-        for m in mascots:
-            if f" {m} " in low or f"{m} football" in low:
-                data["mascot"] = m.title()
+
+        # very light heuristics (we’ll refine later)
+        for m in ["tigers","sharks","wildcats","gators","patriots","tornadoes","bulldogs","panthers","lions","eagles"]:
+            if f" {m} " in low:
+                info["mascot"] = m.title()
                 break
 
-        # record like "10-2"
+        # record like 10-2
         import re
-        m = re.search(r"\b(\d{1,2})[-–](\d{1,2})\b", text)
+        m = re.search(r"\b(\d{1,2})[-–](\d{1,2})\b", low)
         if m:
-            data["record"] = m.group(0)
+            info["record"] = f"{m.group(1)}-{m.group(2)}"
 
-        # city guess: look for “City of …” or address chunks
-        cm = re.search(r"([A-Z][a-z]+(?:\s[A-Z][a-z]+)*)[, ]+\b" + state[:2] + r"\b", text)
-        if cm:
-            data["city"] = cm.group(1)
+        # city guess: “City of X”, or “, FL” style
+        m = re.search(r"\bCity of ([A-Za-z\.\-\' ]+)\b", text)
+        if m:
+            info["city"] = m.group(1).strip()
 
         # logo guess
         for img in soup.find_all("img"):
-            src = (img.get("src") or "").strip()
-            if not src:
-                continue
-            low_src = src.lower()
-            if any(k in low_src for k in ["logo","mascot","seal","crest"]):
+            src = img.get("src", "")
+            if any(k in (src or "").lower() for k in ["logo","mascot","athletic","athletics"]):
                 if src.startswith("http"):
-                    data["logo"] = src
+                    info["logo"] = src
                 else:
-                    # make absolute
                     from urllib.parse import urljoin
-                    data["logo"] = urljoin(url, src)
+                    info["logo"] = urljoin(url, src)
                 break
 
-        return data
-    except Exception:
-        return data
+    except Exception as e:
+        # keep it quiet in prod; fine to print while you’re testing
+        print("Web lookup failed:", e)
+
+    return info
