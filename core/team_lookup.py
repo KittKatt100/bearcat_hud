@@ -1,11 +1,10 @@
-# core/team_lookup.py
+# bearcat_hud/core/team_lookup.py
 import json
 import os
-from core.web_lookup import get_school_web_data
+from bearcat_hud.core.web_lookup import get_school_web_data
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 CLASS_MAP_PATH = os.path.join(DATA_DIR, "classification_map.json")
-
 INFO_NA = "Info Not Available"
 
 def _load_class_map():
@@ -16,49 +15,42 @@ def _load_class_map():
 
 CLASS_MAP = _load_class_map()
 
-def _assoc_for_state(state_str: str):
-    s = state_str.strip().upper()
+def _assoc_for_state(state_str: str) -> dict:
+    s = (state_str or "").strip().upper()
     for key, meta in CLASS_MAP.items():
-        if s == key.upper() or s == meta.get("abbr", "").upper():
+        if s == key.upper() or s == (meta.get("abbr", "")).upper():
             return meta
     return {"name": INFO_NA, "abbr": s, "levels": [], "notes": ""}
 
-def _infer_classification(text: str, assoc_levels):
+def _infer_classification(text: str, assoc_levels) -> str:
     if not text:
         return INFO_NA
     t = text.upper()
-    candidates = []
-    # Common patterns (A/AA/AAA etc. plus numeric tiers)
-    for lvl in assoc_levels or []:
-        if lvl.upper() in t:
-            candidates.append(lvl)
-    if "CLASS " in t:
-        # crude pull like "CLASS 4A" or "CLASS AAA"
-        part = t.split("CLASS ", 1)[1][:6].strip().split()[0]
-        candidates.append(part)
-    return candidates[0] if candidates else INFO_NA
+    # try level keywords (descending priority)
+    for level in assoc_levels or []:
+        if level.upper() in t:
+            return level
+    # very loose capture like "CLASS 4A"
+    import re
+    m = re.search(r"\bCLASS\s*([0-9A-Z-]+)\b", t)
+    if m:
+        return m.group(0).replace("  ", " ").strip()
+    return INFO_NA
 
 def find_school(state: str, county: str, school_name: str) -> dict:
-    # 1) quick web probe
-    info = get_school_web_data(school_name, county, state)
+    meta = get_school_web_data(school_name, county, state)
 
-    # 2) attach HS association metadata
     assoc = _assoc_for_state(state)
-    info["association"] = assoc.get("name") or INFO_NA
+    if meta.get("classification") in (None, "", "Unknown", INFO_NA):
+        meta["classification"] = _infer_classification(meta.get("raw_text", ""), assoc.get("levels"))
 
-    # 3) best-effort classification normalization
-    info["classification"] = _infer_classification(
-        info.get("classification"), assoc.get("levels")
-    )
+    # standardize blanks to Info Not Available
+    for k in ["mascot","colors","city","classification","record","region_standing","recent_trends","logo"]:
+        v = meta.get(k)
+        if not v or str(v).strip().lower() in {"unknown","n/a","placeholder"}:
+            meta[k] = INFO_NA if k != "logo" else "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg"
 
-    # normalize blanks -> Info Not Available
-    for k, v in list(info.items()):
-        if not v or str(v).strip() == "" or str(v).strip().lower() in {"unknown", "n/a"}:
-            info[k] = INFO_NA
-
-    # echo back canonical names
-    info["school_name"] = school_name.title()
-    info["county"] = county.title()
-    info["state"] = state.title()
-    return info
-
+    meta["school_name"] = school_name.title()
+    meta["county"] = county.title()
+    meta["state"] = state.title()
+    return meta
