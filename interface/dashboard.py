@@ -1,32 +1,29 @@
-# bearcat_hud/interface/dashboard.py
+# interface/dashboard.py
 import streamlit as st
-from bearcat_hud.core.team_lookup import find_school  # ✅ correct import
+from core.team_lookup import find_school
 
-def _value(v: str) -> str:
-    if not v or str(v).strip().lower() in {"unknown", "n/a", "info not available"}:
-        return "Info Not Available"
-    return str(v)
+INFO_NA = "Info Not Available"
+
+def _val(v):
+    if not v or str(v).strip().lower() in {"unknown", "n/a", "no data available", "placeholder"}:
+        return INFO_NA
+    return v
 
 def main():
-    st.set_page_config(page_title="Bearcat HUD", layout="centered")
-
-    # Bainbridge theme styling
-    st.markdown("""
+    st.markdown(
+        """
         <style>
-        .stApp { background-color: #1b0d27; }                 /* very dark purple */
-        .bearcat-title { color: #ffd54f; font-size: 2.4rem; font-weight: 800; }
-        .section-title { color: #ffd54f; font-size: 1.6rem; font-weight: 700; margin-top: 1rem; }
-        .label { color: #ffd54f; font-weight: 700; }
-        .val { color: #ffffff; }
-        .note { color: #ffd54f; opacity: .85; }
-        .stButton>button { background:#ffd54f; color:#1b0d27; font-weight:700; border:0; }
-        .stTextInput>div>div>input { background:#2a153b; color:#fff; }
-        .stAlert { background:#103a22 !important; }           /* confirmation bar */
+            .bearcat-bg {background-color:#140422; padding:8px 14px; border-radius:8px;}
+            .bearcat-h1 {color:#f7d23e; font-weight:800; font-size:2.2rem;}
+            .bearcat-label {color:#ddd;}
+            .stButton>button {background:#f7d23e; color:#140422; font-weight:700;}
         </style>
-    """, unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True,
+    )
 
-    st.markdown('<div class="bearcat-title">🏈 Bearcat HUD</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">Enter Opponent Team Info</div>', unsafe_allow_html=True)
+    st.markdown('<div class="bearcat-bg"><span class="bearcat-h1">🏈 Bearcat HUD</span></div>', unsafe_allow_html=True)
+    st.subheader("Enter Opponent Team Info")
 
     with st.form("team_form"):
         school = st.text_input("School Name")
@@ -43,29 +40,31 @@ def main():
 
     data = find_school(state=state, county=county, school_name=school)
 
-    st.success(f"Found {school.title()} in {county.title()} County, {state.upper()}.")
+    st.success(f"Found {school.title()} in {county.title()} County, {state.upper()}")
 
-    st.markdown(
-        f'<div class="section-title">{school.title()} - Overall Team Analysis</div>',
-        unsafe_allow_html=True
-    )
+    st.markdown(f"## {school.title()} - Overall Team Analysis")
 
-    col1, col2 = st.columns([1, 2])
-
+    col1, col2 = st.columns([1,2], gap="large")
     with col1:
         st.image(
-            data.get("logo") or "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
-            caption="Mascot"
+            data.get("logo", "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg"),
+            caption="Mascot",
         )
 
-    with col2:
-        st.markdown(f'<span class="label">Mascot:</span> <span class="val">{_value(data.get("mascot"))}</span>', unsafe_allow_html=True)
-        st.markdown(f'<span class="label">School Colors:</span> <span class="val">{_value(data.get("colors"))}</span>', unsafe_allow_html=True)
-        st.markdown(f'<span class="label">City:</span> <span class="val">{_value(data.get("city"))}</span>', unsafe_allow_html=True)
-        st.markdown(f'<span class="label">Classification:</span> <span class="val">{_value(data.get("classification"))}</span>', unsafe_allow_html=True)
-        st.markdown(f'<span class="label">Record:</span> <span class="val">{_value(data.get("record"))}</span>', unsafe_allow_html=True)
-        st.markdown(f'<span class="label">Region Standing:</span> <span class="val">{_value(data.get("region_standing"))}</span>', unsafe_allow_html=True)
-        st.markdown(f'<span class="label">Recent Trends:</span> <span class="val">{_value(data.get("recent_trends"))}</span>', unsafe_allow_html=True)
+    def row(label, key):
+        st.markdown(f"**{label}:** {_val(data.get(key))}")
 
-    st.divider()
-    st.markdown('<span class="note">📊 This is where your detailed Overall Team Analysis module will appear.</span>', unsafe_allow_html=True)
+    with col2:
+        row("Mascot", "mascot")
+        row("School Colors", "colors")
+        row("City", "city")
+        row("Classification", "classification")
+        row("Record", "record")
+        row("Region Standing", "region_standing")
+        row("Recent Trends", "recent_trends")
+
+    st.markdown("---")
+    st.info("📊 This is where your detailed Overall Team Analysis module will appear.")
+
+if __name__ == "__main__":
+    main()
