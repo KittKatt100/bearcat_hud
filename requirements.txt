@@ -1,4 +1,5 @@
 streamlit
+requests
 duckduckgo-search
 beautifulsoup4
-requests
+python-slugify
