@@ -1,13 +1,18 @@
-# bearcat_hud/core/web_lookup.py
+# core/web_lookup.py
 import requests
-from duckduckgo_search import DDGS
 from bs4 import BeautifulSoup
 
 INFO_NA = "Info Not Available"
 
-def get_school_web_data(school_name: str, county: str, state: str) -> dict:
-    query = f'{school_name} {county} County {state} high school football site:.edu OR site:.org'
-    info = {
+try:
+    # Optional – if not available, we still return safe defaults
+    from duckduckgo_search import DDGS
+    DUCK_OK = True
+except Exception:
+    DUCK_OK = False
+
+def _safe_defaults(school_name, county, state):
+    return {
         "mascot": INFO_NA,
         "colors": INFO_NA,
         "city": INFO_NA,
@@ -16,57 +21,65 @@ def get_school_web_data(school_name: str, county: str, state: str) -> dict:
         "region_standing": INFO_NA,
         "recent_trends": INFO_NA,
         "logo": "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
-        "raw_text": ""
+        "school_name": school_name.title() if school_name else INFO_NA,
+        "county": county.title() if county else INFO_NA,
+        "state": state.title() if state else INFO_NA,
     }
 
+def get_school_web_data(school_name: str, county: str, state: str) -> dict:
+    """
+    Light, failure-safe web look-up. If search/scrape fails, returns defaults.
+    """
+    base = _safe_defaults(school_name, county, state)
+
+    if not DUCK_OK:
+        return base
+
     try:
+        query = f'{school_name} {county} County {state} high school mascot site:.edu OR site:.org'
         with DDGS() as ddgs:
             results = list(ddgs.text(query, max_results=3))
         if not results:
-            return info
+            return base
 
-        # take the first plausible result
-        url = results[0].get("href") or results[0].get("url") or results[0].get("link")
+        url = results[0].get("href") or results[0].get("url") or ""
         if not url:
-            return info
+            return base
 
         html = requests.get(url, timeout=8).text
         soup = BeautifulSoup(html, "html.parser")
-        text = soup.get_text(" ", strip=True)
-        info["raw_text"] = text
+        text = soup.get_text(" ", strip=True).lower()
 
-        low = text.lower()
-
-        # very light heuristics (we’ll refine later)
-        for m in ["tigers","sharks","wildcats","gators","patriots","tornadoes","bulldogs","panthers","lions","eagles"]:
-            if f" {m} " in low:
-                info["mascot"] = m.title()
+        # try mascot
+        mascots = ["tigers","bulldogs","rams","wildcats","gators","patriots","tornadoes","bearcats","hornets","warriors","pirates","panthers"]
+        for m in mascots:
+            if m in text:
+                base["mascot"] = m.title()
                 break
 
-        # record like 10-2
-        import re
-        m = re.search(r"\b(\d{1,2})[-–](\d{1,2})\b", low)
-        if m:
-            info["record"] = f"{m.group(1)}-{m.group(2)}"
+        # crude classification sniff
+        if "class " in text:
+            after = text.split("class ", 1)[1][:8]
+            base["classification"] = after.upper().split()[0].replace(":", "")
 
-        # city guess: “City of X”, or “, FL” style
-        m = re.search(r"\bCity of ([A-Za-z\.\-\' ]+)\b", text)
-        if m:
-            info["city"] = m.group(1).strip()
+        # crude city guess (if a header tag holds city/state)
+        for tag in soup.find_all(["h1","h2","h3"]):
+            t = (tag.get_text(" ", strip=True) or "").strip()
+            if state.lower() in t.lower():
+                base["city"] = t.replace(state, "").strip(" ,–-")
+                break
 
-        # logo guess
+        # logo hunt
         for img in soup.find_all("img"):
-            src = img.get("src", "")
-            if any(k in (src or "").lower() for k in ["logo","mascot","athletic","athletics"]):
+            src = img.get("src","")
+            if any(k in (src or "").lower() for k in ["logo","mascot","seal"]):
                 if src.startswith("http"):
-                    info["logo"] = src
+                    base["logo"] = src
                 else:
-                    from urllib.parse import urljoin
-                    info["logo"] = urljoin(url, src)
+                    domain = url.split("/")[2]
+                    base["logo"] = f"https://{domain}/{src.lstrip('/')}"
                 break
 
-    except Exception as e:
-        # keep it quiet in prod; fine to print while you’re testing
-        print("Web lookup failed:", e)
-
-    return info
+        return base
+    except Exception:
+        return base
