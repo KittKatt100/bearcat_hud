@@ -1,5 +1,14 @@
 {
-  "GEORGIA": { "abbr": "GA", "levels": ["Class 7A","Class 6A","Class 5A","Class 4A","Class 3A","Class 2A","Class A D1","Class A D2"], "notes":"GHSA" },
-  "FLORIDA": { "abbr": "FL", "levels": ["4M","3M","2M","1M","4S","3S","2S","1S","1R","1S/1R","IND"], "notes":"FHSAA Metro/Suburban/Rural" },
-  "ALABAMA": { "abbr": "AL", "levels": ["7A","6A","5A","4A","3A","2A","1A"], "notes":"AHSAA" }
+  "GEORGIA": {
+    "abbr": "GA",
+    "name": "Georgia High School Association",
+    "levels": ["1A", "2A", "3A", "4A", "5A", "6A", "7A"],
+    "notes": "GHSA football classifications."
+  },
+  "FLORIDA": {
+    "abbr": "FL",
+    "name": "Florida High School Athletic Association",
+    "levels": ["1A", "2A", "3A", "4A", "2S", "3S", "4S", "1M", "2M", "3M", "4M"],
+    "notes": "FHSAA uses metro/suburban split."
+  }
 }
