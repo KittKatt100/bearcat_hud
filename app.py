@@ -1,7 +1,5 @@
-# app.py
-import streamlit as st
-from interface.dashboard import main
+# app.py (repo root)
+from bearcat_hud.interface.dashboard import main
 
 if __name__ == "__main__":
-    st.set_page_config(page_title="Bearcat HUD", layout="centered")
     main()
