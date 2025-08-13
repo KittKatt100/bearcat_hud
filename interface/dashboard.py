@@ -1,23 +1,28 @@
-# interface/dashboard.py
+# bearcat_hud/interface/dashboard.py
 import streamlit as st
 
-# ✅ package-qualified imports (works on Streamlit Cloud)
-from bearcat_hud.core.team_lookup import find_school
-from bearcat_hud.core.overall_analysis import render_overall_team_analysis
+# Use package‑relative imports (work when interface/ and core/ are inside bearcat_hud/)
+try:
+    from ..core.team_lookup import find_school
+    from ..core.overall_analysis import render_overall_team_analysis
+except ImportError:
+    # fallback if you’re still finishing the move; harmless if not needed
+    from core.team_lookup import find_school
+    from core.overall_analysis import render_overall_team_analysis
 
-# simple Bainbridge theme helpers you already use
+
 def _header(title: str):
     st.markdown(
         f"""
-        <h1 style="margin-top:0.5rem;color:#F5C518;">{title}</h1>
+        <h1 style="margin-top:.5rem;color:#F5C518;">{title}</h1>
         """,
         unsafe_allow_html=True,
     )
 
+
 def main():
     st.set_page_config(page_title="Bearcat HUD", layout="centered")
 
-    # --- Title ---
     st.markdown(
         """
         <div style="display:flex;align-items:center;gap:.6rem;">
@@ -29,7 +34,6 @@ def main():
     )
     st.subheader("Enter Opponent Team Info")
 
-    # --- Form ---
     with st.form("team_form"):
         school = st.text_input("School Name")
         county = st.text_input("County")
@@ -39,24 +43,23 @@ def main():
     if not submitted:
         return
 
-    # --- Validation ---
     if not (school and county and state):
         st.error("Please fill in all three fields.")
         return
 
-    # --- Lookup ---
     data = find_school(state, county, school)
     st.success(f"Found {school.title()} in {county.title()} County, {state.upper()}")
 
-    # --- Header with school name ---
     _header(f"{school.title()} - Overall Team Analysis")
 
-    # --- Mascot/logo + quick facts ---
     col1, col2 = st.columns([1, 2])
 
     with col1:
         st.image(
-            data.get("logo", "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg"),
+            data.get(
+                "logo",
+                "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg",
+            ),
             caption="Mascot",
         )
 
@@ -76,6 +79,4 @@ def main():
         show("Recent Trends", data.get("recent_trends"))
 
     st.markdown("---")
-
-    # --- Overall analysis section (your long-form writeup) ---
     render_overall_team_analysis(data)
